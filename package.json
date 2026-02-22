@@ -17,7 +17,8 @@
     "prepare": "pnpm run build",
     "test": "node --import tsx --test test/*.test.ts",
     "start": "node --import tsx bin/wayback-dl.js",
-    "dev": "node --import tsx src/cli.ts"
+    "dev": "node --import tsx src/cli.ts",
+    "publish": "npm publish"
   },
   "keywords": [
     "wayback-machine",
