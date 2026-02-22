@@ -26,11 +26,11 @@
     "download",
     "cli"
   ],
-  "author": "",
+  "author": "Scott Weaver <scottmweaver@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/example/wayback-dl.git"
+    "url": "https://github.com/tdlm/wayback-machine-downloader.git"
   },
   "engines": {
     "node": ">=18.0.0"
