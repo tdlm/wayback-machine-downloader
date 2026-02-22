@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `--rewrite-links` CLI option to convert absolute URLs to relative paths in downloaded HTML and CSS files. Links are only rewritten when the target file exists locally in the download directory.
 
+### Fixed
+
+- Link rewriter now treats `www.example.com` and `example.com` as the same site, so links using either variant are rewritten to relative paths when the target exists locally.
+
 ## [1.0.0] - 2025-02-21
 
 ### Added

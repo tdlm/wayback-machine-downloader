@@ -6,14 +6,6 @@ import { resolvePaths } from './file-manager.js';
 
 const HTML_ATTRS = ['href', 'src', 'srcset', 'action', 'data', 'poster'];
 
-function getOrigin(url: string): string {
-  try {
-    return new URL(url).origin;
-  } catch {
-    return '';
-  }
-}
-
 function resolveUrl(url: string, baseUrl: string): string | null {
   try {
     return new URL(url, baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`).href;
@@ -22,9 +14,22 @@ function resolveUrl(url: string, baseUrl: string): string | null {
   }
 }
 
-function isSameOrigin(url: string, baseOrigin: string): boolean {
+/**
+ * Treat www.example.com and example.com as the same site when deciding
+ * whether to rewrite a link.
+ */
+function isSameSite(url: string, baseUrl: string): boolean {
   try {
-    return new URL(url).origin === baseOrigin;
+    const u = new URL(url);
+    const b = new URL(baseUrl);
+    if (u.origin === b.origin) {
+      return true;
+    }
+    const normHost = (host: string) => host.toLowerCase().replace(/^www\./, '');
+    return (
+      u.protocol === b.protocol &&
+      normHost(u.hostname) === normHost(b.hostname)
+    );
   } catch {
     return false;
   }
@@ -39,7 +44,7 @@ async function resolveLocalFilePath(
   if (resolved === null) {
     return null;
   }
-  if (!isSameOrigin(resolved, getOrigin(baseUrl))) {
+  if (!isSameSite(resolved, baseUrl)) {
     return null;
   }
   const withoutQueryHash = resolved.replace(/#.*$/, '').replace(/\?.*$/, '');
@@ -92,7 +97,6 @@ async function rewriteHtmlLinks(
   resolveLocal: (url: string) => Promise<string | null>,
   computeRel: (from: string, to: string) => string
 ): Promise<string> {
-  const baseOrigin = getOrigin(baseUrl);
   const attrPattern = new RegExp(
     `\\s(${HTML_ATTRS.join('|')})\\s*=\\s*["']([^"']+)["']`,
     'gi'
@@ -111,7 +115,7 @@ async function rewriteHtmlLinks(
         const urlPart = spaceIdx >= 0 ? part.slice(0, spaceIdx) : part;
         const descriptor = spaceIdx >= 0 ? part.slice(spaceIdx) : '';
         const resolved = resolveUrl(urlPart, baseUrl);
-        if (resolved === null || !isSameOrigin(resolved, baseOrigin)) {
+        if (resolved === null || !isSameSite(resolved, baseUrl)) {
           rewritten.push(part);
           continue;
         }
@@ -128,7 +132,7 @@ async function rewriteHtmlLinks(
     if (resolved === null) {
       return match;
     }
-    if (!isSameOrigin(resolved, baseOrigin)) {
+    if (!isSameSite(resolved, baseUrl)) {
       return match;
     }
     const localPath = await resolveLocal(resolved);
@@ -148,7 +152,6 @@ async function rewriteCssUrls(
   resolveLocal: (url: string) => Promise<string | null>,
   computeRel: (from: string, to: string) => string
 ): Promise<string> {
-  const baseOrigin = getOrigin(baseUrl);
   const urlPattern = /url\s*\(\s*["']?([^"')]+)["']?\s*\)/g;
 
   return replaceAllAsync(content, urlPattern, async (match, url) => {
@@ -160,7 +163,7 @@ async function rewriteCssUrls(
     if (resolved === null) {
       return match;
     }
-    if (!isSameOrigin(resolved, baseOrigin)) {
+    if (!isSameSite(resolved, baseUrl)) {
       return match;
     }
     const localPath = await resolveLocal(resolved);

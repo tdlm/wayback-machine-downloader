@@ -222,6 +222,56 @@ describe('link-rewriter', () => {
     await rm(dir, { recursive: true, force: true });
   });
 
+  it('rewrites links when URL uses www variant of base domain', async () => {
+    const dir = await setupDir();
+    const backupPath = `${dir}/`;
+    const baseUrl = 'https://www.clickconsulting.com';
+
+    await writeFile(
+      join(dir, 'index.html'),
+      '<link href="https://clickconsulting.com/css/style.css">'
+    );
+    await mkdir(join(dir, 'css'), { recursive: true });
+    await writeFile(join(dir, 'css', 'style.css'), 'body {}');
+
+    const files: FileToDownload[] = [
+      { fileId: '', fileUrl: 'https://www.clickconsulting.com/', timestamp: '20060101120000' },
+      { fileId: 'css/style.css', fileUrl: 'https://www.clickconsulting.com/css/style.css', timestamp: '20060101120000' },
+    ];
+
+    await rewriteLinks(backupPath, baseUrl, files);
+
+    const content = await readFile(join(dir, 'index.html'), 'utf-8');
+    assert.strictEqual(content, '<link href="css/style.css">');
+
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it('rewrites links when baseUrl has no www but link has www', async () => {
+    const dir = await setupDir();
+    const backupPath = `${dir}/`;
+    const baseUrl = 'https://clickconsulting.com';
+
+    await writeFile(
+      join(dir, 'index.html'),
+      '<link href="https://www.clickconsulting.com/css/style.css">'
+    );
+    await mkdir(join(dir, 'css'), { recursive: true });
+    await writeFile(join(dir, 'css', 'style.css'), 'body {}');
+
+    const files: FileToDownload[] = [
+      { fileId: '', fileUrl: 'https://clickconsulting.com/', timestamp: '20060101120000' },
+      { fileId: 'css/style.css', fileUrl: 'https://clickconsulting.com/css/style.css', timestamp: '20060101120000' },
+    ];
+
+    await rewriteLinks(backupPath, baseUrl, files);
+
+    const content = await readFile(join(dir, 'index.html'), 'utf-8');
+    assert.strictEqual(content, '<link href="css/style.css">');
+
+    await rm(dir, { recursive: true, force: true });
+  });
+
   it('handles index.html resolution for directory URLs', async () => {
     const dir = await setupDir();
     const backupPath = `${dir}/`;
