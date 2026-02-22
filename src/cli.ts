@@ -28,6 +28,7 @@ program
   .option('--max-pages <n>', 'Max CDX API pages to fetch', '100')
   .option('--overwrite', 'Re-download existing files')
   .option('--retry <n>', 'Max retries per file', '5')
+  .option('--rewrite-links', 'Rewrite absolute URLs to relative paths in downloaded HTML/CSS')
   .option('--no-color', 'Disable colored output')
   .action(async (url: string, opts: Record<string, string | boolean | undefined>) => {
     const useColors = opts.color !== false;
@@ -46,6 +47,7 @@ program
       concurrency: parseInt(String(opts.concurrency), 10) || 5,
       overwrite: opts.overwrite === true,
       maxRetries: parseInt(String(opts.retry), 10) || 5,
+      rewriteLinks: opts.rewriteLinks === true,
     };
 
     try {
@@ -71,6 +73,9 @@ program
 
       const { files, stats } = await download({
         ...options,
+        onRewriteLinks: options.rewriteLinks
+          ? () => console.log(chalk.cyan('Rewriting links...'))
+          : undefined,
         onSnapshotPage: snapshotBarUpdate,
         onFileListReady: (count) => {
           snapshotBar.stop();

@@ -32,6 +32,7 @@ export interface DownloadOptions {
   concurrency?: number;
   overwrite?: boolean;
   maxRetries?: number;
+  rewriteLinks?: boolean;
 }
 
 /**

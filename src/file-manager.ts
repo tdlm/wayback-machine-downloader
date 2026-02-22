@@ -18,7 +18,7 @@ function buildWaybackUrl(timestamp: string, originalUrl: string): string {
   return `${WAYBACK_BASE}/${timestamp}id_/${originalUrl}`;
 }
 
-function resolvePaths(
+export function resolvePaths(
   backupPath: string,
   fileId: string,
   fileUrl: string

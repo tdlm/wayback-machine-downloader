@@ -2,6 +2,7 @@ import PQueue from 'p-queue';
 import type { Snapshot, FileToDownload, DownloadOptions } from './types.js';
 import { fetchAllSnapshots } from './cdx.js';
 import { downloadFile } from './file-manager.js';
+import { rewriteLinks } from './link-rewriter.js';
 import {
   getBackupName,
   extractFileId,
@@ -84,6 +85,7 @@ export async function download(
     onProgress?: ProgressCallback;
     onSnapshotPage?: SnapshotPageCallback;
     onFileListReady?: (count: number) => void;
+    onRewriteLinks?: () => void;
   }
 ): Promise<DownloadResult> {
   const backupPath = getBackupPath(options.directory, options.baseUrl);
@@ -150,6 +152,11 @@ export async function download(
   );
 
   stats.durationMs = Date.now() - startTime;
+
+  if (options.rewriteLinks === true) {
+    options.onRewriteLinks?.();
+    await rewriteLinks(backupPath, options.baseUrl, files);
+  }
 
   return { files, stats };
 }
