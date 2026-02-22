@@ -1,6 +1,6 @@
 {
   "name": "wayback-dl",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Download archived websites from the Internet Archive Wayback Machine",
   "type": "module",
   "main": "dist/index.js",
@@ -17,8 +17,7 @@
     "prepare": "pnpm run build",
     "test": "node --import tsx --test test/*.test.ts",
     "start": "node --import tsx bin/wayback-dl.js",
-    "dev": "node --import tsx src/cli.ts",
-    "publish": "npm publish"
+    "dev": "node --import tsx src/cli.ts"
   },
   "keywords": [
     "wayback-machine",
