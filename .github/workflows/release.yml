@@ -13,12 +13,16 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-      # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
           node-version: '24.x'
-          registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
+      - name: Configure npm registry for pnpm
+        run: |
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" >> .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: pnpm install --frozen-lockfile
       - run: pnpm publish --provenance --access public --no-git-checks
         env:
