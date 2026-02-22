@@ -43,6 +43,9 @@ wayback-dl https://example.com -f 20060101000000 -t 20101231235959
 
 # List files as JSON without downloading
 wayback-dl https://example.com -l
+
+# Rewrite absolute URLs to relative paths for local browsing
+wayback-dl https://example.com --rewrite-links
 ```
 
 ### Options
@@ -62,6 +65,7 @@ wayback-dl https://example.com -l
 | `--max-pages <n>` | Max CDX API pages (default: 100) |
 | `--overwrite` | Re-download existing files |
 | `--retry <n>` | Max retries per file (default: 5) |
+| `--rewrite-links` | Rewrite absolute URLs to relative paths in downloaded HTML/CSS |
 | `--no-color` | Disable colored output |
 
 ## Requirements
