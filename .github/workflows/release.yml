@@ -15,8 +15,8 @@ jobs:
           version: 10
       - uses: actions/setup-node@v4
         with:
-          node-version: '24.x'
-          cache: 'pnpm'
+          node-version: "18.x"
+          cache: "pnpm"
       - name: Configure npm registry for pnpm
         run: |
           echo "registry=https://registry.npmjs.org/" >> .npmrc
